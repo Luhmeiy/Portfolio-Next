@@ -1,8 +1,9 @@
 import Image from "next/image";
-import { Github, Monitor } from "lucide-react";
 import { ProjectsData } from "@/interfaces/ProjectsData";
+import { WorkProps } from "@/interfaces/TranslationsData";
+import { Github, Monitor } from "lucide-react";
 
-export default async function Work() {
+export default async function Work(work: WorkProps) {
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_BASE_FETCH_URL}/api/projects`
 	);
@@ -11,17 +12,15 @@ export default async function Work() {
 	return (
 		<div
 			className="flex min-h-screen w-full flex-col items-center justify-center py-10 tablet:pt-28"
-			id="work"
+			id={work.id}
 		>
 			<div className="relative flex w-full max-w-6xl flex-col transition-all duration-[.75s] ease-in-out [@media(max-width:1152px)]:px-4">
 				<div className="mb-10 text-center">
-					<h1 className="text-7xl font-bold">Work</h1>
+					<h1 className="text-7xl font-bold">{work.title}</h1>
 
-					<p className="hidden tablet:inline-block">
-						Hover to reveal links ;)
-					</p>
+					<p className="hidden tablet:inline-block">{work.hover}</p>
 					<p className="hidden max-tablet:inline-block">
-						Click to reveal links ;)
+						{work.click}
 					</p>
 				</div>
 
@@ -59,20 +58,22 @@ export default async function Work() {
 										<a
 											href={item.githublink}
 											target="_blank"
+											aria-label={`${work.source} - ${item.title}`}
 											className="flex items-center justify-center gap-2 bg-white px-3 py-1 text-black transition-colors duration-500 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-700 focus:ring-offset-2 focus:ring-offset-white active:bg-gray-200"
 										>
 											<Github size={20} />
-											Source Code
+											{work.source}
 										</a>
 
 										{item.livepreview && (
 											<a
 												href={item.livepreview}
 												target="_blank"
+												aria-label={`${work.live} - ${item.title}`}
 												className="flex items-center justify-center gap-2 bg-white px-3 py-1 text-black transition-colors duration-500 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-700 focus:ring-offset-2 focus:ring-offset-white active:bg-gray-200"
 											>
 												<Monitor size={20} />
-												Live Preview
+												{work.live}
 											</a>
 										)}
 									</div>

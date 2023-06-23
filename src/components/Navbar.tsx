@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+	Github,
 	Home,
+	Linkedin,
 	Monitor,
 	PanelTopClose,
 	Scroll,
@@ -14,6 +16,11 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import * as Popover from "@radix-ui/react-popover";
 
+interface NavbarData {
+	social: string;
+	titles: string[];
+}
+
 const icons = [
 	<Home size={24} key="Home" />,
 	<User size={24} key="User" />,
@@ -22,10 +29,22 @@ const icons = [
 	<Send size={24} key="Send" />,
 ];
 
-const navItems = ["home", "about", "skills", "work", "contact"];
-
 export default function Navbar() {
 	const [toggle, setToggle] = useState(false);
+	const [navItems, setNavItems] = useState<NavbarData>();
+
+	const getNavItems = async () => {
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_FETCH_URL}/api/translations/navbar?language=en`
+		);
+		const data = await response.json();
+
+		setNavItems(data[0]);
+	};
+
+	useEffect(() => {
+		getNavItems();
+	}, []);
 
 	return (
 		<nav className="bg-[rgba(255, 255, 255, .25)] border-b-[rgba(255, 255, 255, .18)] fixed z-10 flex w-full justify-center border-b px-4 py-8 backdrop-blur-sm backdrop-filter max-tablet:bottom-0 max-tablet:rounded-xl max-tablet:bg-white max-tablet:px-6 max-tablet:py-3 max-tablet:shadow-[0_0_20px_rgba(168,168,168,.25)]">
@@ -35,20 +54,21 @@ export default function Navbar() {
 				</div>
 
 				<ul className="flex items-center justify-center max-tablet:hidden">
-					{navItems.map((item) => (
-						<li
-							key={`link-${item}`}
-							className="mx-4 flex cursor-pointer justify-center"
-						>
-							<a
-								href={`#${item}`}
-								className="rounded-sm font-bold uppercase text-gray-600 duration-[.3s] ease-in-out hover:text-purple-600 focus:outline-none focus:ring-2 focus:ring-violet-700 focus:ring-offset-2 focus:ring-offset-white"
-								aria-label={`Scroll to ${item}`}
+					{navItems &&
+						navItems.titles.map((item) => (
+							<li
+								key={`link-${item}`}
+								className="mx-4 flex cursor-pointer justify-center"
 							>
-								{item}
-							</a>
-						</li>
-					))}
+								<a
+									href={`#${item}`}
+									aria-label={`Scroll to ${item}`}
+									className="rounded-sm font-bold uppercase text-gray-600 duration-[.3s] ease-in-out hover:text-purple-600 focus:outline-none focus:ring-2 focus:ring-violet-700 focus:ring-offset-2 focus:ring-offset-white"
+								>
+									{item}
+								</a>
+							</li>
+						))}
 				</ul>
 
 				<div className="relative flex items-center justify-center rounded-full tablet:hidden">
@@ -67,22 +87,24 @@ export default function Navbar() {
 								className="inset-b-0 fixed inset-x-0 z-20 flex w-full flex-col items-end rounded-3xl bg-white px-6 py-4 shadow-[0_0_20px_rgba(168,168,168,.25)]"
 							>
 								<ul className="grid h-full w-full grid-cols-3">
-									{navItems.map((item, i) => (
-										<li
-											key={item}
-											className="group m-4 flex cursor-pointer flex-col items-center"
-										>
-											<a
-												href={`#${item}`}
-												className="flex flex-col items-center text-sm font-bold uppercase text-gray-500 duration-[.3s] ease-in-out hover:text-purple-600 focus:outline-none focus:ring-2 focus:ring-violet-700 focus:ring-offset-2 focus:ring-offset-white"
+									{navItems &&
+										navItems.titles.map((item, i) => (
+											<li
+												key={item}
+												className="group m-4 flex cursor-pointer flex-col items-center"
 											>
-												{icons[i]}
-												<span className="mt-1">
-													{item}
-												</span>
-											</a>
-										</li>
-									))}
+												<a
+													href={`#${item}`}
+													aria-label={`Scroll to ${item}`}
+													className="flex flex-col items-center text-sm font-bold uppercase text-gray-500 duration-[.3s] ease-in-out hover:text-purple-600 focus:outline-none focus:ring-2 focus:ring-violet-700 focus:ring-offset-2 focus:ring-offset-white"
+												>
+													{icons[i]}
+													<span className="mt-1">
+														{item}
+													</span>
+												</a>
+											</li>
+										))}
 
 									<li className="group relative m-4 flex cursor-pointer flex-col items-center">
 										<Popover.Root>
@@ -100,9 +122,10 @@ export default function Navbar() {
 													<a
 														href="https://www.linkedin.com/in/luhmeiy/"
 														target="_blank"
+														aria-label="Redirect to LinkedIn"
 														className="mr-8 flex flex-col items-center"
 													>
-														<i className="devicon-linkedin-plain text-2xl" />
+														<Linkedin size={24} />
 														<span className="mt-1">
 															Linkedin
 														</span>
@@ -111,9 +134,10 @@ export default function Navbar() {
 													<a
 														href="https://github.com/Luhmeiy"
 														target="_blank"
+														aria-label="Redirect to GitHub"
 														className="flex flex-col items-center"
 													>
-														<i className="devicon-github-original text-2xl" />
+														<Github size={24} />
 														<span className="mt-1">
 															GitHub
 														</span>
